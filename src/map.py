@@ -2,19 +2,22 @@ import stations as s
 import folium as fol
 from pyproj import Proj
 import matplotlib.pyplot as plt
-
-import time
+import nchelper
+import json
 
 class Map:
-    def __init__(self,ncHelper):
+    def __init__(self,pollutants):
         self.colorsLocs = {"U":"red", "S":"green", "R":"blue"}
         self.colorsStats = {"B":"red", "T":"green", "I":"blue"}
         self.html = "./generated/map.html"
 
-        self.stations = s.Stations("../data/stanice_shp/stanice_nove.shp")
-        self.ncHelp = ncHelper
+        self.stations = s.Stations("../data/stanice_shp/stanice_projekt.shp")
+        self.pollutants = pollutants
+        with open("../data/config.json", "r") as read_file:
+            pollutants_json = json.load(read_file)
+            self.grid = nchelper.NcGridHelper(pollutants_json['grid'])
 
-        self.map = fol.Map(location= self.ncHelp.getStartCoords(), zoom_start=7, tiles='Stamen Terrain')
+        self.map = fol.Map(location= self.grid.getStartCoords(), zoom_start=7, tiles='Stamen Terrain')
         self.createPopUp()
 
         self.map.save(self.html)
@@ -40,21 +43,27 @@ class Map:
         parser = "<p><b>x: </b>{:} <b>y: </b>{:}<br>" \
                  "<b>Name: </b>{:} <br>" \
                  "<b>Station location: </b> {:} <br> " \
-                 "<b>Station type: </b> {:}</p>".format(station.getX(), station.getY(), station.getName(), station.getTypeLocation(), station.getTypeStation())
+                 "<b>Station type: </b> {:} <br>" \
+                 "<b>Measured concentration: </b> {:}</p>".format(station.getX(),
+                                                                  station.getY(),
+                                                                  station.getName(),
+                                                                  station.getTypeLocation(),
+                                                                  station.getTypeStation(),
+                                                                  self.pollutants.getCurrentMeasured(station.getName()))
         return parser
     
 
-    def generateRasters(self, timeIdx):
+    def generateRasters(self):
         #tu som iba skopiroval kod z jeho githubu nerozumiem moc co tam robi a asi to ani neni dobre umiestnene
         #bude traba to treba spravit asi uplne inac 
         
-        self.map = fol.Map(location=self.ncHelp.getStartCoords(), zoom_start=7, tiles='Stamen Terrain')
+        self.map = fol.Map(location=self.grid.getStartCoords(), zoom_start=7, tiles='Stamen Terrain')
 
         p = Proj("+init=EPSG:3857")
 
-        x_L, y_L = p(self.ncHelp.getLon(), self.ncHelp.getLat(), inverse=False)
+        x_L, y_L = p(self.grid.getLon(), self.grid.getLat(), inverse=False)
         
-        no2 = self.ncHelp.getRasterAtTimeIndex(timeIdx)
+        no2 = self.pollutants.getCurrentModeled()
 
         fig = plt.figure(figsize=(10, 6))
         ax = fig.add_subplot(111)
