@@ -1,31 +1,37 @@
 import dash
 from dash.dependencies import Input, Output
 import map
-import nchelper as nh
+import pollutants as ps
+import json
 from GUI import GUI
 
-import time
 
 class App(dash.Dash):
     def __init__(self):
         dash.Dash.__init__(self)
-        self.ncHelper = nh.NcHelper("../data/GRIDCRO2D_01012015.nc", "../data/LIFEIP_Small_NO2_2015.nc")
+        with open("../data/config.json", "r") as read_file:
+            pollutants_json = json.load(read_file)
+            self.pollutants = ps.Pollutants(pollutants_json['pollutants_nc'], pollutants_json['pollutants_csv'])
 
-        self.map = map.Map(self.ncHelper)
-        self.layout = GUI(self.map).layout()
+
+        self.map = map.Map(self.pollutants)
+        self.layout =\
+            GUI(self.map).layout()
+
+
 
         @self.callback(
             Output(component_id='slider-output', component_property='children'),
             [Input(component_id='slider', component_property='value')])
         def update_date(input_data):
-            datetime = self.ncHelper.getTimeAtIndex(int(input_data))
-            return "Date: {:} time: {:}".format(datetime[0][0], datetime[0][1])
+            self.pollutants.setCurrentDate(self.pollutants.getCurrentDate().replace(hour=int(input_data)))
+            return str(self.pollutants.getCurrentDate())
 
         @self.callback(
             Output(component_id='map', component_property='srcDoc'),
             [Input(component_id='slider', component_property='value')])
         def update_map(input_data):
-            self.map.generateRasters(int(input_data))
+            self.map.generateRasters()
             return open(self.map.html,'r').read()
 
 
