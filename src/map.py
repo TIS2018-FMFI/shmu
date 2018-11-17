@@ -2,7 +2,7 @@ import stations as s
 import folium as fol
 from pyproj import Proj
 import matplotlib.pyplot as plt
-import nchelper
+import ncreader
 import json
 
 class Map:
@@ -15,7 +15,7 @@ class Map:
         self.pollutants = pollutants
         with open("../data/config.json", "r") as read_file:
             pollutants_json = json.load(read_file)
-            self.grid = nchelper.NcGridHelper(pollutants_json['grid'])
+            self.grid = ncreader.NcGridReader(pollutants_json['grid'])
 
         self.map = fol.Map(location= self.grid.getStartCoords(), zoom_start=7, tiles='Stamen Terrain')
         self.createPopUp()
@@ -56,7 +56,7 @@ class Map:
     def generateRasters(self):
         #tu som iba skopiroval kod z jeho githubu nerozumiem moc co tam robi a asi to ani neni dobre umiestnene
         #bude traba to treba spravit asi uplne inac 
-        
+
         self.map = fol.Map(location=self.grid.getStartCoords(), zoom_start=7, tiles='Stamen Terrain')
 
         p = Proj("+init=EPSG:3857")
