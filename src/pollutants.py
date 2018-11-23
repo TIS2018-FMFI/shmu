@@ -1,5 +1,5 @@
-import nchelper as nch
-import csvhelper as csvh
+import ncreader as ncr
+import csvreader as csvr
 
 
 class Pollutants:
@@ -9,10 +9,10 @@ class Pollutants:
             :param nc_path: netcdf file path
             :param csv_path: csv file path or None
             '''
-            self.nc = nch.NcPollutantHelper(nc_path)
+            self.nc = ncr.NcPollutantReader(nc_path)
             self.csv = None
             if csv_path is not None:
-                self.csv = csvh.CsvHelper(csv_path)
+                self.csv = csvr.CsvReader(csv_path)
 
         def getModeled(self, datetime):
             return self.nc.getRasterAtDateTime(datetime)
