@@ -23,14 +23,19 @@ class RequestHandler(BaseHTTPRequestHandler):
     def __init__(self, request, client_address, server):
         BaseHTTPRequestHandler.__init__(self, request, client_address, server)
         
-    def _set_headers(self):
+    def _set_headers(self, responseType='html'):
+        
+        headerValue = 'text/html'
+        if responseType == 'css':
+            headerValue='text/css'
+            
         self.send_response(200)
-        self.send_header('Content-type', 'text/html')
+        self.send_header('Content-type', headerValue)
         self.end_headers()
 
     def do_GET(self):
-        self._set_headers()
-        response= self.get_response()
+        response, contentType = self.get_response()
+        self._set_headers(contentType)
         self.wfile.write(response)
         #self.respond(response)
         #RequestHandler.data
@@ -49,6 +54,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         
         url = self.path.split('?')
         path = url[0]
+        responseType = 'html'
         params = {}
         if len(url) > 1:
             params = self.parseGetParams(url[1])
@@ -64,10 +70,13 @@ class RequestHandler(BaseHTTPRequestHandler):
         if len(splitPath) > 1:
             suffix = splitPath[1]
 
-        if suffix == 'tiff':
+        if suffix == 'css':
+            responseType = 'css'
+
+        if suffix == 'tiff' or suffix == 'json':
             res_path = './generated' + path
             if os.path.exists(res_path):
-                return open(res_path, 'rb').read()
+                return open(res_path, 'rb').read(), responseType
             
             
         if path == '/':
@@ -76,9 +85,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             res_path = './web' + path
         
         if os.path.exists(res_path):
-            return bytes(open(res_path).read(), 'UTF-8')
-        
-        return bytes(self.path + " not found!", 'UTF-8')
+            return bytes(open(res_path).read(), 'UTF-8'), responseType
+        print(res_path)
+        return bytes(self.path + " not found!", 'UTF-8'), responseType
 
     def respond(self, response):
         self.wfile.write(bytes(response, 'UTF-8'))
