@@ -1,0 +1,44 @@
+#mapid { height: 500px; }
+
+                div.app{
+          width: 60%;
+          padding: 20px;
+          margin-left: 20%;
+          background-color: #999999;
+        }
+        div.div_container{
+          /* width: 600px; */
+          width: 100%;
+          height: 400px;
+          background-color: #73736b;
+          overflow: hidden;
+        }
+
+        div.map {
+          width: 85%;
+          height: 90%;
+          background-color: #cececa;
+          float:left;
+          margin: 2%;
+          background-image: url("map.png");
+        }
+
+        div.concentration_scale {
+          width: 8%;
+          height: 90%;
+          background-color: #cececa;
+          margin: 2%;
+          overflow: hidden;
+        }
+
+        input#time_picker{
+          width: 100%;
+        }
+        div.inputs{
+          margin-top: 20px;
+          margin-bottom: 30px;
+        }
+        select{
+          width: 100px;
+          margin-right: 20px;
+        }
