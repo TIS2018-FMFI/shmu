@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+	#mapid { height: 500px; }
+</style>
+
+
+<!--<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+	integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+	crossorigin=""/>
+ 
+
+<script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+  integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+  crossorigin="">
+</script>-->
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+
+
+
+
+<!--<link rel="stylesheet" href="leaflet/leaflet.css">
+<script src="leaflet/leaflet.js"></script>-->
+<script src="./js/leaflet-geotiff.js"></script>
+<script src="./js/geotiff.js"></script>
+<script src="./js/plotty.js"></script>
+<script src="./js/map.js"></script>
+
+ </head>
+ 
+ 
+<body>
+  <div id="mapid"></div>
+  
+Choose hour:
+<select id="selectHour">
+  <option value="0" selected>0</option>
+  <option value="1">1</option>
+  <option value="5">5</option>
+  <option value="10">10</option>
+  <option value="15">15</option>
+  <option value="20">20</option>
+  <option value="23">23</option>
+</select>
+  
+  <button type="button "id="buttonid" onclick="reloadTiff()">Reload tiff</button>
+ </body>
