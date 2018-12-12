@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html>
-<head>
-<style>
-	#mapid { height: 500px; }
-</style>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>shmu</title>
+    <script src="http://yui.yahooapis.com/3.18.1/build/yui/yui-min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./style.css">-->
+
 
 
 <!--<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
 	integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
 	crossorigin=""/>
- 
+
 
 <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
   integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
@@ -29,22 +31,157 @@
 <script src="./js/plotty.js"></script>
 <script src="./js/map.js"></script>
 
- </head>
- 
- 
-<body>
-  <div id="mapid"></div>
-  
-Choose hour:
-<select id="selectHour">
-  <option value="0" selected>0</option>
-  <option value="1">1</option>
-  <option value="5">5</option>
-  <option value="10">10</option>
-  <option value="15">15</option>
-  <option value="20">20</option>
-  <option value="23">23</option>
-</select>
-  
-  <button type="button "id="buttonid" onclick="reloadTiff()">Reload tiff</button>
- </body>
+  </head>
+  <body class="yui3-skin-sam" >
+
+    <div class="app">
+      <h1>Vizualizácia koncentrácie</h1>
+
+      <div class="div_container">
+        <div id ="mapid" class="map">
+
+        </div>
+        <div class="concentration_scale">
+
+        </div>
+      </div>
+
+      <div>
+        <input type="range" id="time_picker" name="time_picker" onchange="changeTime()"
+               min="0" max="23">
+      </div>
+
+      <p id = "time"> </p>
+
+      <div class="inputs">
+        <select id = "substance">
+          <option value="N02">NO2</option>
+          <option value="O2">O2</option>
+          <option value="SO2">SO2</option>
+        </select>
+
+        <select id = "colorScale" onchange="changeColorScale()" >
+          <option value="inferno">inferno</option>
+          <option value="rainbow">rainbow</option>
+          <option value="jet">jet</option>
+          <option value="hsv">hsv</option>
+          <option value="hot">hot</option>
+          <option value="cool">cool</option>
+          <option value="spring">spring</option>
+          <option value="summer">summer</option>
+          <option value="autumn">autumn</option>
+          <option value="winter">winter</option>
+          <option value="bone">bone</option>
+          <option value="copped">copped</option>
+
+        </select>
+
+        <button type="button">Animation</button>
+
+      </div>
+
+      <!--setter for beggining -->
+      <script>
+        document.getElementById("time").innerHTML = "time : " + document.getElementById("time_picker").value + " : 00" ;
+        docu
+      </script>
+
+      <!--changing label for picked time-->
+      <script>
+        function changeTime() {
+          document.getElementById("time").innerHTML = "time : " + document.getElementById("time_picker").value + " : 00" ;
+          reloadTiff(document.getElementById("time_picker").value);
+          }
+      </script>
+
+      <!--changing  color scale -->
+      <script>
+        function changeColorScale(){
+        reloadTiff
+        reloadTiff(document.getElementById("time_picker").value, document.getElementById("colorScale").value)
+        }
+      </script>
+
+
+              <!-- Add an additional blue button style -->
+        <style>
+        .yui3-button {
+            margin:10px 0px 10px 0px;
+            color: #fff;
+            color: black;
+            /* background-color: #3476b7; */
+        }
+        </style>
+
+        <div id="demo" class="yui3-skin-sam yui3-g"> <!-- You need this skin class -->
+
+          <div id="leftcolumn" class="yui3-u">
+             <!-- Container for the calendar -->
+             <div id="mycalendar"></div>
+          </div>
+          <div id="rightcolumn" class="yui3-u">
+           <div id="links" style="padding-left:20px;">
+              <!-- The buttons are created simply by assigning the correct CSS class -->
+              <button id="togglePrevMonth" class="yui3-button">Toggle Previous Month's Dates</button><br>
+              <button id="toggleNextMonth" class="yui3-button">Toggle Next Month's Dates</button><br>
+              Selected date: <span id="selecteddate"></span>
+           </div>
+          </div>
+        </div>
+
+        <script type="text/javascript">
+        YUI().use('calendar', 'datatype-date', 'cssbutton',  function(Y) {
+
+            // Create a new instance of calendar, placing it in
+            // #mycalendar container, setting its width to 340px,
+            // the flags for showing previous and next month's
+            // dates in available empty cells to true, and setting
+            // the date to today's date.
+            var calendar = new Y.Calendar({
+              contentBox: "#mycalendar",
+              width:'340px',
+              showPrevMonth: true,
+              showNextMonth: true,
+              date: new Date()}).render();
+
+            // Get a reference to Y.DataType.Date
+            var dtdate = Y.DataType.Date;
+
+            // Listen to calendar's selectionChange event.
+            calendar.on("selectionChange", function (ev) {
+
+              // Get the date from the list of selected
+              // dates returned with the event (since only
+              // single selection is enabled by default,
+              // we expect there to be only one date)
+              var newDate = ev.newSelection[0];
+
+              // Format the date and output it to a DOM
+              // element.
+              Y.one("#selecteddate").setHTML(dtdate.format(newDate));
+            });
+
+
+            // When the 'Show Previous Month' link is clicked,
+            // modify the showPrevMonth property to show or hide
+            // previous month's dates
+            Y.one("#togglePrevMonth").on('click', function (ev) {
+              ev.preventDefault();
+              calendar.set('showPrevMonth', !(calendar.get("showPrevMonth")));
+            });
+
+            // When the 'Show Next Month' link is clicked,
+            // modify the showNextMonth property to show or hide
+            // next month's dates
+            Y.one("#toggleNextMonth").on('click', function (ev) {
+              ev.preventDefault();
+              calendar.set('showNextMonth', !(calendar.get("showNextMonth")));
+            });
+        });
+        </script>
+
+
+
+    </div>
+  </body>
+</html>
