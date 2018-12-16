@@ -1,5 +1,5 @@
 import pandas as pd
-
+import numpy as np
 
 class CsvReader:
 
@@ -11,6 +11,14 @@ class CsvReader:
         self.df['dtvalue'] = pd.to_datetime(self.df['dtvalue'])
         self.df = self.df.set_index('dtvalue')
 
+    def getConcentrationsForDay(self,datetime,station):
+        date = pd.to_datetime(datetime.date())
+        day = []
+        for i in range(24):
+            date += pd.Timedelta(hours=1)
+            day.append(self.getConcentration(date,station))
+        return day
+
     def getConcentration(self, datetime, station):
         '''
         :param datetime:
@@ -21,13 +29,11 @@ class CsvReader:
             return None
         if not (self.df.index.min() <= datetime and datetime <= self.df.index.max()):
             return None
-        return self.df.loc[datetime,station]
+        value = self.df.loc[datetime,station]
+        if np.isnan(value):
+            return -1
+        return value
 
-
-
-ps = {"NO2":"../data/csv_pollutants/NO2_2003_2017.csv"}
-
-p = CsvReader(ps["NO2"])
 
 
 
