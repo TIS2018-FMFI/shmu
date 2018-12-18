@@ -6,6 +6,8 @@ class Stations:
             '''
             :param series: pandas series of station attributes
             '''
+            self.types = {"B":"Pozaďová", "T":"Dopravná","I":"Priemyslená"}
+            self.typeslocation = {"U":"Mestská", "S":"Predmestská", "R":"Vidiecka"}
             self.station = series.to_dict()
 
         def getName(self):
@@ -30,13 +32,13 @@ class Stations:
             '''
             :return: type of station
             '''
-            return self.station['Typ stanic']
+            return "/".join([self.types[char] for char in self.station['Typ stanic'].split("/")])
 
         def getTypeLocation(self):
             '''
             :return: type of geographic location for station
             '''
-            return self.station['Typ oblast']
+            return self.typeslocation[self.station['Typ oblast']]
 
 
 
@@ -64,6 +66,8 @@ class Stations:
         for i in range(len(self.stations)):
             stations_list.append(self.Station(self.stations.iloc[i]))
         return stations_list
+
+
 
 
 

@@ -1,15 +1,15 @@
 import ncreader as ncr
 import csvreader as csvr
-
+import json
 
 class Pollutants:
     class _Pollutant:
-        def __init__(self, nc_path, csv_path):
+        def __init__(self, nc_path, csv_path, pol_name):
             '''
             :param nc_path: netcdf file path
             :param csv_path: csv file path or None
             '''
-            self.nc = ncr.NcPollutantReader(nc_path)
+            self.nc = ncr.NcPollutantReader(nc_path,pol_name)
             self.csv = None
             if csv_path is not None:
                 self.csv = csvr.CsvReader(csv_path)
@@ -21,6 +21,12 @@ class Pollutants:
             if self.csv is None:
                 return None
             return self.csv.getConcentration(datetime,station)
+
+        def getMeasuredForDay(self,datetime,station):
+            if self.csv is None:
+                return None
+            return self.csv.getConcentrationsForDay(datetime,station)
+
 
         def getMaxDate(self):
             return self.nc.getMaxDate()
@@ -38,9 +44,10 @@ class Pollutants:
         self._pollutants = dict()
         self._polNames = list(pollutants_nc.keys())
         for pol in self._polNames:
-            self._pollutants[pol] = self._Pollutant(pollutants_nc[pol],pollutants_csv.get(pol,None))
+            self._pollutants[pol] = self._Pollutant(pollutants_nc[pol],pollutants_csv.get(pol,None),pol)
         self._currentPollutant = self._polNames[0]
         self._currentDate = self._pollutants[self._currentPollutant].getMinDate()
+
 
     def getCurrentModeled(self):
         '''
@@ -56,6 +63,10 @@ class Pollutants:
         :return: measured values for currently picked datetime and currently picked pollutant at station or None or NaN
         '''
         return self._pollutants[self._currentPollutant].getMeasured(self._currentDate, station)
+
+    def getCurrentMeasuredForDay(self,station):
+        return self._pollutants[self._currentPollutant].getMeasuredForDay(self._currentDate,station)
+
 
     def getCurrentMaxDate(self):
         '''
@@ -101,6 +112,28 @@ class Pollutants:
         '''
         return self._polNames
 
+    def createJsonForStations(self,station_list):
+        '''
+        Create json "stations.json" for stations
+        :param station_list:
+        :return:
+        '''
+        data = dict()
+        data["cnt"] = len(station_list)
+        stations = []
+        for station in station_list:
+            stationJson = dict()
+            stationJson["x"] = station.getX()
+            stationJson["y"] = station.getY()
+            stationJson["name"] = station.getName()
+            stationJson["loctype"] = station.getTypeLocation()
+            stationJson["type"] = station.getTypeStation()
+            stationJson["measured"] = self.getCurrentMeasuredForDay(station.getName())
+            stations.append(stationJson)
+        data["stations"] = stations
+        json_data = json.dumps(data, ensure_ascii=False)
+        with open("../data/stations.json", "w+", encoding="UTF-8") as file:
+            file.write(json_data)
 
 
 
