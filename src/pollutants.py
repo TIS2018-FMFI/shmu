@@ -1,5 +1,5 @@
-import ncreader as ncr
-import csvreader as csvr
+from src.ncreader import NcPollutantReader
+from src.csvreader import CsvReader
 import json
 
 class Pollutants:
@@ -9,10 +9,10 @@ class Pollutants:
             :param nc_path: netcdf file path
             :param csv_path: csv file path or None
             '''
-            self.nc = ncr.NcPollutantReader(nc_path,pol_name)
+            self.nc = NcPollutantReader(nc_path,pol_name)
             self.csv = None
             if csv_path is not None:
-                self.csv = csvr.CsvReader(csv_path)
+                self.csv = CsvReader(csv_path)
 
         def getModeled(self, datetime):
             return self.nc.getRasterAtDateTime(datetime)
@@ -112,9 +112,20 @@ class Pollutants:
         '''
         return self._polNames
 
+    def _createJson(self, data,name):
+        '''
+        Create json with name and data
+        :param data: dict keys-values
+        :param name: name of json
+        :return:
+        '''
+        json_data = json.dumps(data, ensure_ascii=False)
+        with open("generated/{:}.json".format(name), "w", encoding="UTF-8") as file:
+            file.write(json_data)
+
     def createJsonForStations(self,station_list):
         '''
-        Create json "stations.json" for stations
+        Create dict for stations.json
         :param station_list:
         :return:
         '''
@@ -131,9 +142,28 @@ class Pollutants:
             stationJson["measured"] = self.getCurrentMeasuredForDay(station.getName())
             stations.append(stationJson)
         data["stations"] = stations
-        json_data = json.dumps(data, ensure_ascii=False)
-        with open("../data/stations.json", "w+", encoding="UTF-8") as file:
-            file.write(json_data)
+        self._createJson(data,"stations")
 
 
 
+    def createJsonForPollutantNames(self):
+        '''
+        Create dict for "pollutantNames.json"
+        :return:
+        '''
+        data = dict()
+        names = self.getPollutants()
+        data["cnt"] = len(names)
+        data["pollutants"] = names
+        self._createJson(data,"pollutantNames")
+
+
+    def createJsonForMinMaxDate(self):
+        '''
+        Create dict for "dates.json"
+        :return:
+        '''
+        data = dict()
+        data["min"] = str(self.getCurrentMinDate())
+        data["max"]= str(self.getCurrentMaxDate())
+        self._createJson(data,"dates")
