@@ -1,6 +1,6 @@
-
 import map
 import pollutants as ps
+import stations
 import json
 import os
 from http.server import BaseHTTPRequestHandler, HTTPServer
@@ -12,7 +12,12 @@ class Data:
         with open("../data/config.json", "r") as read_file:
             self.config = json.load(read_file)
             self.pollutants = ps.Pollutants(self.config['pollutants_nc'], self.config['pollutants_csv'])
+            self.stations = stations.Stations(self.config['stanice'])
+            
         self.map = map.Map(self.pollutants, self.config)
+        self.pollutants.createJsonForStations(self.stations.getStations())
+        self.pollutants.createJsonForPollutantNames()
+        self.pollutants.createJsonForMinMaxDate()
         print('koniec nacitavania dat')
 
 
@@ -78,6 +83,11 @@ class RequestHandler(BaseHTTPRequestHandler):
             if os.path.exists(res_path):
                 return open(res_path, 'rb').read(), responseType
             
+        if suffix == 'jpg' or suffix == 'png':
+            res_path = './web/images' + path
+            if os.path.exists(res_path):
+                return open(res_path, 'rb').read(), responseType
+            
             
         if path == '/':
             res_path = './web/index.html'
@@ -86,7 +96,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         
         if os.path.exists(res_path):
             return bytes(open(res_path).read(), 'UTF-8'), responseType
-        print(res_path)
+        print(self.path + " not found!")
         return bytes(self.path + " not found!", 'UTF-8'), responseType
 
     def respond(self, response):

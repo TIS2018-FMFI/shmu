@@ -10,7 +10,7 @@
 
 
 L.LeafletGeotiff = L.ImageOverlay.extend({
-    initialize: function (url, options) { 
+    initialize: function (tiff, options) { 
         if(typeof(plotty)=='undefined'){
             throw new Error("plotty not defined");
         };
@@ -25,13 +25,14 @@ L.LeafletGeotiff = L.ImageOverlay.extend({
         } 
         L.Util.setOptions(this, options);
         
-        this.options.colorScale = (options.colorScale==undefined) ? 'viridis' : options.colorScale;
+        this.options.colorScale = (options.colorScale==undefined) ? 'inferno' : options.colorScale;
+
         this.options.clampLow = (options.clampLow==undefined) ? true : options.clampLow;
         this.options.clampHigh = (options.clampHigh==undefined) ? true : options.clampHigh;
         this.options.arrowSize = (options.arrowSize==undefined) ? 20 : options.arrowSize;
         
         this._preLoadColorScale(); //Make sure colorScale is ready even if image takes a while to load
-        this._getData(url);
+        this._getData(tiff);
     },
     setURL: function(newURL) {
         this._getData(newURL);
@@ -61,8 +62,10 @@ L.LeafletGeotiff = L.ImageOverlay.extend({
             map.off('zoomanim', this._animateZoom, this);
         }
     },
-    _getData: function(url) {
-        var self = this;
+    _getData: function(tiff) {
+		console.log(tiff);
+		this._parseTIFF(tiff);
+        /*var self = this;
         var request = new XMLHttpRequest();  
         request.onload = function() {
             if (this.status >= 200 && this.status < 400) {
@@ -73,7 +76,7 @@ L.LeafletGeotiff = L.ImageOverlay.extend({
         //request.open("GET", url+"?"+params, true, true);
         request.open("GET", url, true, true);
         request.responseType = "arraybuffer";
-        request.send();
+        request.send();*/
     },
     _parseTIFF: function (arrayBuffer) {
         this.tiff = GeoTIFF.parse(arrayBuffer);
@@ -352,6 +355,6 @@ L.LeafletGeotiff = L.ImageOverlay.extend({
     },
 });
 
-L.leafletGeotiff = function (url, bounds, options) {
-    return new L.LeafletGeotiff(url, bounds, options);
+L.leafletGeotiff = function (tiff, bounds, options) {
+    return new L.LeafletGeotiff(tiff, bounds, options);
 };
