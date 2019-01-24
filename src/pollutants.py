@@ -1,5 +1,5 @@
-from src.ncreader import NcPollutantReader
-from src.csvreader import CsvReader
+from ncreader import NcPollutantReader
+from csvreader import CsvReader
 import json
 
 class Pollutants:
