@@ -46,13 +46,27 @@ function showFirst() {
 
 function createMap() {
 	mymap = L.map('mapid').setView([49.372288, 17.101004], 6);
-	 
+
 	 var mainLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
 		attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
 		maxZoom: 18,
 		id: 'mapbox.streets',
 		accessToken: 'pk.eyJ1IjoidmlkbyIsImEiOiJjam9kMnhrY2swdHU4M3FuMnRtMmZtZXkzIn0.0eihDz33xkCGLhdWOvDi3Q'
 	}).addTo(mymap);
+	 mymap.on('click', function(e) {
+		conc = layerTmp.getValueAtLatLng(e.latlng.lat, e.latlng.lng);
+		var popLocation= new L.LatLng(e.latlng.lat,e.latlng.lng);
+		mymap.on('click', function(e) {
+			if (conc === undefined){
+				return;
+			}
+			var popLocation= e.latlng;
+			var popup = L.popup()
+				.setLatLng(popLocation)
+				.setContent('<p>'+ Math.round(conc*100)/100 +'</p>'+"<img src='http://joshuafrazier.info/images/maptime.gif' alt='maptime logo gif' width='90px'/>")
+				.openOn(mymap);
+    	});
+	});
 }
 
 function loadStations() {
@@ -136,7 +150,6 @@ function showTiff(index, colorScale = 'rainbow') {
 	if(layer != null) mymap.removeLayer(layer);
 	mymap.addLayer(layerTmp);
 	layer = layerTmp;
-	
 	/*if (layerTmp.getElement() && layerTmp.getElement().complete) {
 		console.log('ano');
 		if(layer != null) mymap.removeLayer(layer);
