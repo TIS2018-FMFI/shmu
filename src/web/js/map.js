@@ -55,15 +55,15 @@ function createMap() {
 	}).addTo(mymap);
 	 mymap.on('click', function(e) {
 		conc = layerTmp.getValueAtLatLng(e.latlng.lat, e.latlng.lng);
-		var popLocation= new L.LatLng(e.latlng.lat,e.latlng.lng);
+		var popLocation = new L.LatLng(e.latlng.lat,e.latlng.lng);
 		mymap.on('click', function(e) {
 			if (conc === undefined){
 				return;
 			}
-			var popLocation= e.latlng;
+			var popLocation = e.latlng;
 			var popup = L.popup()
 				.setLatLng(popLocation)
-				.setContent('<p>'+ Math.round(conc*100)/100 +'</p>'+"<img src='http://joshuafrazier.info/images/maptime.gif' alt='maptime logo gif' width='90px'/>")
+				.setContent('<p>'+ Math.round(conc*100)/100 +'</p>')
 				.openOn(mymap);
     	});
 	});
@@ -76,7 +76,7 @@ function loadStations() {
 
 
 
-function showStations(arrStations, hour=0) {
+function showStations(arrStations,hour=0) {
 	L.icon = function (options) {
     return new L.Icon(options);
 };
@@ -85,6 +85,7 @@ function showStations(arrStations, hour=0) {
     options: {
         iconSize:     [30, 30],
         iconAnchor:   [15, 30],
+		popupAnchor:  [0, -30]
 
     }
 });
@@ -99,25 +100,26 @@ function showStations(arrStations, hour=0) {
 
 	for (i=0; i<numStations; i++) {
 		
-		var measuredValue = arrStations["stations"][i]["measured"];
-		var seenVal = measuredValue;
-		var icon = greenIcon;
+		var measuredValue = arrStations["stations"][i]["measured"][hour];
+		var seenVal;
+		var icon;
 		
-		if ( measuredValue < 0) {				// -1, station was not measuring
-			icon = yellowIcon;
-			seenVal = 'N/A';
-		}
-		
-		if ( measuredValue == null) {			// station is out of order
+		if ( measuredValue < 0) {				// -1, station is not active
 			icon = redIcon;
-			seenVal = 'N/A'; 
+			seenVal = 'Not active';
+		}else if ( measuredValue == null) {			// station was never measuring in that time or that pollutant
+			icon = yellowIcon;
+			seenVal = 'Not measuring';
+		} else {
+			seenVal = Math.round(measuredValue*100)/100;
+			icon = greenIcon;
 		}
 		
 		var html = '<p><b>' + justStations[i]["name"]+ '</b>' +
-			'<br>location:'+justStations[i]["y"]+','+justStations[i]["x"]+
+			'<br>location: '+justStations[i]["y"]+', '+justStations[i]["x"]+
 			'<br>station type: '+ justStations[i]["type"]+
-			'<br>location type:'+justStations[i]["loctype"]+
-			'<br>measured:'+seenVal+'</p>';
+			'<br>location type: '+justStations[i]["loctype"]+
+			'<br>measured: '+seenVal+'</p>';
 			
 		var marker = L.marker([	justStations[i]["y"],
 								justStations[i]["x"]], {icon: icon})
