@@ -472,7 +472,6 @@ function GeoTIFF(rawData, options) {
   this.cache = options.cache || false;
 
   var BOM = this.dataView.getUint16(0, 0);
-  console.log(BOM.toString(16));
   if (BOM === 0x4949) {
     this.littleEndian = true;
   } else if (BOM === 0x4D4D) {

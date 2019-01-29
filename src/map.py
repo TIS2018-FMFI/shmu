@@ -7,7 +7,7 @@ from osgeo import gdal_array
 from osgeo import osr
 
 class Map:
-    def __init__(self,pollutants, config):
+    def __init__(self, pollutants, config):
         self.colorsLocs = {"U":"red", "S":"green", "R":"blue"}
         self.colorsStats = {"B":"red", "T":"green", "I":"blue"}
 
@@ -54,6 +54,7 @@ class Map:
             self.pollutants.setCurrentDate(self.pollutants.getCurrentDate().replace(hour=h))
             self.pollutantData = self.pollutants.getCurrentModeled()
             self.makeTiff(h)
+        self.pollutants.setCurrentDate(self.pollutants.getCurrentDate().replace(hour=0))
         
 
     def makeTiff(self, hour):
@@ -66,7 +67,7 @@ class Map:
         geotransform=(xmin,xres,0,ymax,0, -yres)   
 
         tiff_path = './generated/raster' + str(hour) + '.tiff'
-        print(ncols, nrows, tiff_path)
+        print(tiff_path)
         output_raster = gdal.GetDriverByName('GTiff').Create(tiff_path, ncols, nrows, 1 ,gdal.GDT_Float32)
         output_raster.SetGeoTransform(geotransform)  
         srs = osr.SpatialReference()                 
