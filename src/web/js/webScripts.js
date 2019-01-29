@@ -1,35 +1,36 @@
 var timer = null;
+var switcher = true;
 
 // metod that start metods which setting components
 function startSetMethods(){
 	actualizeTimeLabel();
 	loadPollutantsNames();
 	loadDateBorders();
-	
+
 
 }
 
 //load JSON file from server and call callback with response as param
 function loadHttpJSON(url, callbackFunction) {
-	
-	var request = new XMLHttpRequest();  
+
+	var request = new XMLHttpRequest();
         request.onload = function() {
             if (this.status >= 200 && this.status < 400) {
 				var response = JSON.parse(this.responseText);
 				callbackFunction(response);
-            } 
+            }
         };
         request.open("GET", url, true);
         request.send();
-		
+
 }
-	
+
 function loadPollutantsNames() {
 	loadHttpJSON('pollutantNames.json', setPollutantsNames);
 }
 
 function setPollutantsNames(pollutantsNames){
-	
+
     var select = document.getElementById("substanceSelect");
 	names = pollutantsNames['pollutants'];
 
@@ -51,7 +52,7 @@ function setDateBorders(dates) {
 }
 
 function removeHoursFromDate(dateWithHours) {
-	return dateWithHours.split(" ")[0];	
+	return dateWithHours.split(" ")[0];
 }
 
 //setting time label when application starts
@@ -96,7 +97,7 @@ function changedDate(date){
 	minDate = new Date(calendarInput.min);
 	maxDate = new Date(calendarInput.max);
 	actualDate = new Date(date);
-	
+
 	if(minDate.getTime() > actualDate.getTime() || maxDate.getTime() < actualDate.getTime()) {
 		setInfoSpan('Pre tento dátum a emisiu nie sú dáta!');
 		return;
@@ -105,7 +106,7 @@ function changedDate(date){
 	console.log(date);
 	rasterForDay(date);
 	resetTimePicker();
-	stopAnimation(); 
+	stopAnimation();
 }
 
 // function is called when substance is changed
@@ -115,8 +116,8 @@ function changedPollutant(newPollutant){
 	rasterForPollutant(newPollutant);
 	loadDateBorders();
 	resetTimePicker();
-	stopAnimation(); 
-        
+	stopAnimation();
+
 }
 
 
@@ -144,21 +145,21 @@ function rasterNextHour() {
 	actualizeTimeLabel();
 	colorScale = document.getElementById("colorScale").value;
 	showTiff(new_time,colorScale);	*/
-	
+
 	time_picker = document.getElementById("time_picker");
 	var old_time = Number(time_picker.value);
 	var new_time = (old_time + 1) % 24;
 	time_picker.value = new_time;
 	changedTime();
-	
+
 }
 
 function playAnimation(){
-	
+
 	if(timer != null) {
 		return;
 	}
-	
+
 	rasterNextHour();							//first "tick", otherwise it will wait first second withou changing raster after starting animation
 	timer = setInterval(rasterNextHour, 1000);
 }
@@ -170,15 +171,35 @@ function stopAnimation(){
 	}
 }
 
+function playStopAnimation(){
+  var elem = document.getElementById("playStopButton");
+    if (elem.value=="PLAY") elem.value = "STOP";
+    else elem.value = "PLAY";
+
+
+    if (switcher){
+        switcher = false;
+        playAnimation()
+        elem.title = "stop animation" ;
+    }
+
+    else{
+        stopAnimation()
+        switcher = true;
+        elem.title = "play animation" ;
+
+    }
+}
+
 function showLoading(shown) {
-	
+
 	if(shown) {
 		setInfoSpan("Načítavam dáta...");
 	}
 	else {
 		setInfoSpan("");
 	}
-} 
+}
 
 function setInfoSpan(msg) {
 	var elem = document.getElementById("infoSpan");
@@ -187,19 +208,5 @@ function setInfoSpan(msg) {
 	if(msg == "") {
 		elem.style.display = "none";
 	}
-	
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

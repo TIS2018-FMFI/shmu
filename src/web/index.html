@@ -17,13 +17,14 @@
     <link rel="stylesheet" type="text/css" href="./style.css">
 
  </head>
- 
+
 <body class="yui3-skin-sam" >
 
     <div class="app">
       <h1>Vizualizácia koncentrácie emisií</h1>
-	  <span id="infoSpan"></span>
 
+      <p><span id="infoSpan"></span></p>
+	  
       <div id ="mapid"> </div>
 
 
@@ -44,7 +45,7 @@
 
           <select id = "substanceSelect" onchange="changedPollutant(value)" > </select>
 
-          <select id = "colorScale" onchange="changeColorScale()" >
+          <select id = "colorScale" onchange="changeColorScale()" class="select-css" >
 		    <option selected value="rainbow">rainbow</option>
             <option value="inferno">inferno</option>
             <option value="jet">jet</option>
@@ -59,8 +60,8 @@
 
           </select>
 
-          <button type="button" onclick="playAnimation()">play</button>
-		  <button type="button" onclick="stopAnimation()">stop</button>
+          <input id = "playStopButton"type="button" class="example_d" align="center" onclick="playStopAnimation()" value="PLAY" title = "play animation" > </input>
+
 
 
       </div>
