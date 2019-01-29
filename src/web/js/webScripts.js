@@ -2,7 +2,7 @@ var timer = null;
 
 // metod that start metods which setting components
 function startSetMethods(){
-	setTime();
+	actualizeTimeLabel();
 	loadPollutantsNames();
 	loadDateBorders();
 	
@@ -55,20 +55,21 @@ function removeHoursFromDate(dateWithHours) {
 }
 
 //setting time label when application starts
-function setTime() {
-	document.getElementById("time").innerHTML = "time : " + document.getElementById("time_picker").value + " : 00" ;
+function actualizeTimeLabel() {
+	document.getElementById("time").innerHTML = "time : " + getActualTime() + " : 00" ;
 }
 
 //changing label for picked time, function is called when timeline panel is changed.
 // calling reloadTiff which change raster on current hour and colorScale
-function changeTime() {
-	setTime();
+function changedTime() {
+	actualizeTimeLabel();
 	actualizeTiff();
+	showStations(getActualTime());
 }
 
 //read hour and colorscale from inputs and show right tiff
 function actualizeTiff() {
-	var hour = document.getElementById("time_picker").value;
+	var hour = getActualTime();
 	var colorscale = document.getElementById("colorScale").value;
 	showTiff(hour, colorscale);
 }
@@ -78,9 +79,10 @@ function actualizeTiff() {
 // function setting calendar, format of parameters is "2015-01-01"
 // WARNING! function is called in startSetMethods()
 function setDate(minDate,maxDate){
-	document.getElementById("calendar_input").min = minDate;
-	document.getElementById("calendar_input").max = maxDate;
-	document.getElementById("calendar_input").value = minDate;
+	calendarInput = document.getElementById("calendar_input");
+	calendarInput.min = minDate;
+	calendarInput.max = maxDate;
+	calendarInput.value = minDate;
 
 }
 
@@ -89,19 +91,31 @@ function setDate(minDate,maxDate){
 // function is called when date is changed
 // parameter is actual date format is "2015-01-01"
 function changedDate(date){
-
-    x = date.split("-");
-    year = x[0];
-    month = x [1];
-    day = x[2];
-    
+	setInfoSpan('');
+	calendarInput = document.getElementById("calendar_input");
+	minDate = new Date(calendarInput.min);
+	maxDate = new Date(calendarInput.max);
+	actualDate = new Date(date);
 	
+	if(minDate.getTime() > actualDate.getTime() || maxDate.getTime() < actualDate.getTime()) {
+		setInfoSpan('Pre tento dátum a emisiu nie sú dáta!');
+		return;
+	}
+	//console.log(, calendarInput.max, date);
+	console.log(date);
+	rasterForDay(date);
+	resetTimePicker();
+	stopAnimation(); 
 }
 
 // function is called when substance is changed
 //parameter is actual substance
-function changedPollutant(value){
-    console.log(value);
+function changedPollutant(newPollutant){
+    console.log(newPollutant);
+	rasterForPollutant(newPollutant);
+	loadDateBorders();
+	resetTimePicker();
+	stopAnimation(); 
         
 }
 
@@ -112,15 +126,30 @@ function changeColorScale(){
 	actualizeTiff();
 }
 
+function resetTimePicker() {
+	document.getElementById("time_picker").value = 0;
+	actualizeTimeLabel();
+}
+
+function getActualTime() {
+	return Number(document.getElementById("time_picker").value);
+}
+
 function rasterNextHour() {
 
+	/*time_picker = document.getElementById("time_picker");
+	var old_time = Number(time_picker.value);
+	var new_time = (old_time + 1) % 24;
+	time_picker.value = new_time;
+	actualizeTimeLabel();
+	colorScale = document.getElementById("colorScale").value;
+	showTiff(new_time,colorScale);	*/
+	
 	time_picker = document.getElementById("time_picker");
 	var old_time = Number(time_picker.value);
 	var new_time = (old_time + 1) % 24;
 	time_picker.value = new_time;
-	setTime();
-	colorScale = document.getElementById("colorScale").value;
-	showTiff(new_time,colorScale);	
+	changedTime();
 	
 }
 
@@ -129,7 +158,6 @@ function playAnimation(){
 	if(timer != null) {
 		return;
 	}
-    console.log("animate2");
 	
 	rasterNextHour();							//first "tick", otherwise it will wait first second withou changing raster after starting animation
 	timer = setInterval(rasterNextHour, 1000);
@@ -143,14 +171,24 @@ function stopAnimation(){
 }
 
 function showLoading(shown) {
-	var elem = document.getElementById("loadingDataSpan");
+	
 	if(shown) {
-		elem.style.display = "block";
+		setInfoSpan("Načítavam dáta...");
 	}
 	else {
-		elem.style.display = "none";
+		setInfoSpan("");
 	}
 } 
+
+function setInfoSpan(msg) {
+	var elem = document.getElementById("infoSpan");
+	elem.innerHTML = msg;
+	elem.style.display = "block";
+	if(msg == "") {
+		elem.style.display = "none";
+	}
+	
+}
 
 
 

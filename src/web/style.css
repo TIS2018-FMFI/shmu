@@ -46,7 +46,7 @@ border-radius: 5px;
 height: 15px;
 }
 
-#loadingDataSpan {
+#infoSpan {
 	display:block;
 	margin-bottom:10px;
 	font-weight:bold;

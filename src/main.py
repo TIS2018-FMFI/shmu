@@ -3,6 +3,7 @@ import pollutants as ps
 import stations
 import json
 import os
+import pandas as pd
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 class Data:
@@ -15,10 +16,13 @@ class Data:
             self.stations = stations.Stations(self.config['stanice'])
             
         self.map = map.Map(self.pollutants, self.config)
+        self.generateCurrentJsons()
+        print('koniec nacitavania dat')
+
+    def generateCurrentJsons(self):
         self.pollutants.createJsonForStations(self.stations.getStations())
         self.pollutants.createJsonForPollutantNames()
-        self.pollutants.createJsonForMinMaxDate()
-        print('koniec nacitavania dat')
+        self.pollutants.createJsonForMinMaxDate() 
 
 
 class RequestHandler(BaseHTTPRequestHandler):
@@ -55,7 +59,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         return
 
     def get_response(self):
-        print(self.path)
+        #print(self.path)
         
         url = self.path.split('?')
         path = url[0]
@@ -63,11 +67,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         params = {}
         if len(url) > 1:
             params = self.parseGetParams(url[1])
-        
-##        if 'tiff' in params:
-##            res_path = './generated' + path
-##            if os.path.exists(res_path):
-##                return open(res_path, 'rb').read()
 
         splitPath = path.split('.')
         baseName = path[0]
@@ -77,8 +76,8 @@ class RequestHandler(BaseHTTPRequestHandler):
 
         if suffix == 'css':
             responseType = 'css'
-
-        if suffix == 'tiff' or suffix == 'json':
+            
+        if suffix == 'json' or suffix == 'tiff':
             res_path = './generated' + path
             if os.path.exists(res_path):
                 return open(res_path, 'rb').read(), responseType
@@ -87,10 +86,49 @@ class RequestHandler(BaseHTTPRequestHandler):
             res_path = './web/images' + path
             if os.path.exists(res_path):
                 return open(res_path, 'rb').read(), responseType
-            
+
+
+        if path == '/setDate':
+            response = 'true'
+            date = params.get('date', False)
+            if date is not False:
+                if date == '0000-00-00':
+                    finalTimestamp = RequestHandler.data.pollutants.getCurrentMinDate()
+                else:
+                    dateWithTime = date + ' 00:00:00'
+                    finalTimestamp = pd.Timestamp(dateWithTime)
+                RequestHandler.data.pollutants.setCurrentDate(finalTimestamp)
+                RequestHandler.data.generateCurrentJsons()
+                RequestHandler.data.map.generateRasters()
+            else:
+                response = 'false'
+            return bytes(response, 'UTF-8'), responseType
+        
+
+        if path == '/setPollutant':
+            response = 'true'
+            pollutant = params.get('pollutant', False)
+            if pollutant is not False:
+                RequestHandler.data.pollutants.setCurrentPollutant(pollutant)
+                RequestHandler.data.generateCurrentJsons()
+            else:
+                response = 'false'
+            return bytes(response, 'UTF-8'), responseType
+                
             
         if path == '/':
             res_path = './web/index.html'
+            oldPollutant = RequestHandler.data.pollutants.getCurrentPollutant()
+            oldDate = RequestHandler.data.pollutants.getCurrentDate()
+            
+            RequestHandler.data.pollutants.setCurrentDefault()
+
+            newPollutant = RequestHandler.data.pollutants.getCurrentPollutant()
+            newDate = RequestHandler.data.pollutants.getCurrentDate()
+
+            if oldPollutant != newPollutant or oldDate != newDate:
+                RequestHandler.data.map.generateRasters()
+                RequestHandler.data.generateCurrentJsons()
         else:
             res_path = './web' + path
         

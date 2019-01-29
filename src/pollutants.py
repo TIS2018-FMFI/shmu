@@ -45,9 +45,7 @@ class Pollutants:
         self._polNames = list(pollutants_nc.keys())
         for pol in self._polNames:
             self._pollutants[pol] = self._Pollutant(pollutants_nc[pol],pollutants_csv.get(pol,None),pol)
-        self._currentPollutant = self._polNames[0]
-        self._currentDate = self._pollutants[self._currentPollutant].getMinDate()
-
+        self.setCurrentDefault()
 
     def getCurrentModeled(self):
         '''
@@ -111,6 +109,14 @@ class Pollutants:
         :return: list of all pollutant names
         '''
         return self._polNames
+
+    def setCurrentDefault(self):
+        '''
+        Sets currentDate, currentPollutant to default values
+        :return: None
+        '''
+        self.setCurrentPollutant(self._polNames[0])
+        self.setCurrentDate(self.getCurrentMinDate())
 
     def _createJson(self, data,name):
         '''
