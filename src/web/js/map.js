@@ -1,6 +1,7 @@
 var mymap = null;
 var layer = null;
 var tiffArr = new Array(24);
+var legend = null;
 
 document.addEventListener('DOMContentLoaded', function() {
 	createMap();
@@ -128,6 +129,42 @@ function showStations(arrStations,hour=0) {
 	}
 }
 
+function setContainer(div){
+	var parent = document.createElement("DIV");
+	var leftmin = document.createElement("DIV");
+	var rightmax = document.createElement("DIV");
+	parent.setAttribute("class", "minmaxLegend");
+	leftmin.setAttribute("class", "minLegend");
+	rightmax.setAttribute("class", "maxLegend");
+	parent.appendChild(leftmin);
+	parent.appendChild(rightmax);
+	leftmin.innerText = "Min: " + Math.round(Math.min.apply(Math,layer.raster.data)*100)/100;
+	rightmax.innerText = "Max: " + Math.round(Math.max.apply(Math,layer.raster.data)*100)/100;
+	var colorImg = document.createElement("IMG");
+	colorImg.src = layer.colorScaleData;
+	colorImg.style.height = '10px';
+	colorImg.style.width = '200px';
+	div.appendChild(colorImg);
+	div.appendChild(parent);
+	return div;
+}
+
+function createLegend() {
+	legend = L.control({ position: "bottomright" });
+	legend.onAdd = function(map) {
+  		var div = L.DomUtil.create("div", "legend");
+	  	return setContainer(div);
+	};
+	legend.addTo(mymap);
+}
+
+function updateLegend(){
+	div = legend.getContainer();
+	div.innerHTML = "";
+	setContainer(div);
+
+}
+
 
 function showTiff(index, colorScale = 'rainbow') {
 	
@@ -149,9 +186,15 @@ function showTiff(index, colorScale = 'rainbow') {
 	tiff = tiffArr[index];
 	
 	layerTmp = L.leafletGeotiff(tiff=tiff, options=options);
+
 	if(layer != null) mymap.removeLayer(layer);
 	mymap.addLayer(layerTmp);
 	layer = layerTmp;
+	if (!legend){
+		createLegend();
+	} else {
+		updateLegend();
+	}
 	/*if (layerTmp.getElement() && layerTmp.getElement().complete) {
 		console.log('ano');
 		if(layer != null) mymap.removeLayer(layer);
