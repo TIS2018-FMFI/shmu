@@ -69,6 +69,11 @@ input#calendar_input{
 	margin-bottom: 20px;
 }
 
+::-webkit-calendar-picker-indicator { 
+	background: #00000070; 
+	color:#0080B8;
+}
+
 #infoSpan {
 	margin-bottom:10px;
 font-weight:bold;
@@ -168,6 +173,7 @@ p#time{
 
 		/* Set options to normal weight */
 		.select-css option {
+			color: black;
 			font-weight:normal;
 		}
 

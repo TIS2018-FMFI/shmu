@@ -6,8 +6,6 @@ function startSetMethods(){
 	actualizeTimeLabel();
 	loadPollutantsNames();
 	loadDateBorders();
-
-
 }
 
 //load JSON file from server and call callback with response as param
@@ -106,7 +104,7 @@ function changedDate(date){
 	console.log(date);
 	rasterForDay(date);
 	resetTimePicker();
-	stopAnimation();
+	resetAnimation();
 }
 
 // function is called when substance is changed
@@ -116,7 +114,7 @@ function changedPollutant(newPollutant){
 	rasterForPollutant(newPollutant);
 	loadDateBorders();
 	resetTimePicker();
-	stopAnimation();
+	resetAnimation();
 
 }
 
@@ -179,16 +177,24 @@ function playStopAnimation(){
 
     if (switcher){
         switcher = false;
-        playAnimation()
+        playAnimation();
         elem.title = "stop animation" ;
     }
 
     else{
-        stopAnimation()
+        stopAnimation();
         switcher = true;
         elem.title = "play animation" ;
 
     }
+}
+
+function resetAnimation() {
+	stopAnimation();
+	var elem = document.getElementById("playStopButton");
+	elem.value = "PLAY";
+	switcher = true;
+	
 }
 
 function showLoading(shown) {

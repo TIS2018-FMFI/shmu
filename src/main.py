@@ -9,6 +9,10 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 class Data:
     
     def __init__(self):
+        '''
+        load config, create classes Pollutants, Stations, Map
+        '''
+        
         print('nacitavam data')
         with open("../data/config.json", "r") as read_file:
             self.config = json.load(read_file)
@@ -26,6 +30,9 @@ class Data:
 
 
 class RequestHandler(BaseHTTPRequestHandler):
+    '''
+    handles requests from clients
+    '''
 
     data = Data()
 
@@ -46,20 +53,17 @@ class RequestHandler(BaseHTTPRequestHandler):
         response, contentType = self.get_response()
         self._set_headers(contentType)
         self.wfile.write(response)
-        #self.respond(response)
-        #RequestHandler.data
 
     def do_HEAD(self):
         self._set_headers()
         
     def do_POST(self):
-        # Doesn't do anything with posted data
-        #self._set_headers()
-        #self.respond("<html><body><h1>POST!</h1></body></html>")
         return
 
     def get_response(self):
-        #print(self.path)
+        '''
+        :return appropriate data based on request in byte form  and type of response
+        '''
         
         url = self.path.split('?')
         path = url[0]
@@ -141,6 +145,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(bytes(response, 'UTF-8'))
 
     def parseGetParams(self, paramsData):
+        '''
+        :param paramsData: part of url with params
+        :return: dict with parsed params key: value
+        '''
         params = {}
         for p in paramsData.split('&'):
             p = p.split('=')
@@ -149,10 +157,13 @@ class RequestHandler(BaseHTTPRequestHandler):
         
         
 def run(server_class=HTTPServer, handler_class=RequestHandler, port=8000):
+    '''
+    Starts server with overrided handler
+    '''
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     httpd.serve_forever()
-    RequestHandler(None, None, None)                    #prve volanie Handlera, ktore trva dlho, koli nacitavaniu dat
+    RequestHandler(None, None, None)                    #first call of Handlera, which take longer, because of loading files
 
 if __name__ == "__main__":
     from sys import argv

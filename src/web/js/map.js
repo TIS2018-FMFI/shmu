@@ -110,7 +110,7 @@ function createMap() {
 			var popLocation= e.latlng;
 			var popup = L.popup()
 				.setLatLng(popLocation)
-				.setContent('<p>'+ Math.round(conc*100)/100 +'</p>'+"<img src='http://joshuafrazier.info/images/maptime.gif' alt='maptime logo gif' width='90px'/>")
+				.setContent('<p>'+ Math.round(conc*100)/100 +'</p>')
 				.openOn(mymap);
     	});
 	});

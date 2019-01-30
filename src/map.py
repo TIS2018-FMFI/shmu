@@ -8,48 +8,22 @@ from osgeo import osr
 
 class Map:
     def __init__(self, pollutants, config):
+        '''
+        creates tiff rasters from np arrays
+        '''
         self.colorsLocs = {"U":"red", "S":"green", "R":"blue"}
         self.colorsStats = {"B":"red", "T":"green", "I":"blue"}
 
-        #self.stations = s.Stations("../data/stanice_shp/stanice_projekt.shp")
         self.pollutants = pollutants
         self.grid = ncreader.NcGridReader(config['grid'])
 
         self.lon, self.lat = self.grid.getLon(), self.grid.getLat()
         self.generateRasters()
 
-    def createPopUp(self):
-        for stanica in self.stations.getStations():
-            fol.CircleMarker(location = [stanica.getY(), stanica.getX()],
-                        radius=15,
-                        color = self.colorByStationLocation(stanica),
-                        fill = True,
-                        fill_color = self.colorByStationType(stanica),
-                        popup = self.createPopUpHTML(stanica)
-                       ).add_to(self.map)
-
-
-    def colorByStationType(self, station):
-        return self.colorsStats.get(station.getTypeStation(),"black")
-
-    def colorByStationLocation(self, station):
-        return self.colorsLocs.get(station.getTypeLocation(),"black")
-
-    def createPopUpHTML(self, station):
-        parser = "<p><b>x: </b>{:} <b>y: </b>{:}<br>" \
-                 "<b>Name: </b>{:} <br>" \
-                 "<b>Station location: </b> {:} <br> " \
-                 "<b>Station type: </b> {:} <br>" \
-                 "<b>Measured concentration: </b> {:}</p>".format(station.getX(),
-                                                                  station.getY(),
-                                                                  station.getName(),
-                                                                  station.getTypeLocation(),
-                                                                  station.getTypeStation(),
-                                                                  self.pollutants.getCurrentMeasured(station.getName()))
-        return parser
-    
-
     def generateRasters(self):
+        '''
+        creates 24 tiff rasters for every hour
+        '''
         for h in range(24):
             self.pollutants.setCurrentDate(self.pollutants.getCurrentDate().replace(hour=h))
             self.pollutantData = self.pollutants.getCurrentModeled()
@@ -58,6 +32,9 @@ class Map:
         
 
     def makeTiff(self, hour):
+        '''
+        create tiff for specific hour from np array with data and lot, lan coordinates
+        '''
         array = np.flip(self.pollutantData, 0)
 
         xmin,ymin,xmax,ymax = [self.lon.min(),self.lat.min(),self.lon.max(),self.lat.max()]
@@ -67,7 +44,6 @@ class Map:
         geotransform=(xmin,xres,0,ymax,0, -yres)   
 
         tiff_path = './generated/raster' + str(hour) + '.tiff'
-        print(tiff_path)
         output_raster = gdal.GetDriverByName('GTiff').Create(tiff_path, ncols, nrows, 1 ,gdal.GDT_Float32)
         output_raster.SetGeoTransform(geotransform)  
         srs = osr.SpatialReference()                 
