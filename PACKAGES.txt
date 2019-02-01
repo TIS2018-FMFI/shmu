@@ -1,0 +1,52 @@
+Zoznam pythonovskıch balíèkov, ktoré treba naištalova ku korektnému fungovaniu aplikácie.
+Balíèky sú odsadené pod¾a toho ako na sebe závisia. Ak sú u raz rozpísané závislosti balíèka, pri druhom vıskyte sa u nerozpisujú.
+Prvá úroveò sú balíky, ktoré sa explicitne v skriptoch pouívajú, staèí ruène nainštalova tie a balíèky na ktorıch sú závislé sa nainštalujú 
+automaticky. Uvádzané sú len pre prípadné problémy.
+Pouité verzia pythonu bola 3.7.1
+
+
+------------------------------------------------------------
+pandas                 0.23.4
+	python-dateutil        2.7.5
+		six                    1.11.0
+	numpy                  1.15.3
+	pytz                   2018.7
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+numpy                  1.15.3
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+geopandas              0.4.0
+	pyproj                 1.9.5.1
+	Shapely                1.6.4.post1
+	pandas                 0.23.4
+	Fiona                  1.7.13
+		cligj                  0.5.0
+			Click                  7.0
+		six                    1.11.0
+		click-plugins          1.0.4
+			Click                  7.0
+		munch                  2.3.2
+			six                    1.11.0
+------------------------------------------------------------
+
+
+------------------------------------------------------------
+netCDF4                1.4.2
+	numpy                  1.15.3
+	cftime                 1.0.2.1
+		numpy                  1.15.3
+------------------------------------------------------------
+
+
+------------------------------------------------------------	
+GDAL                   2.3.2 (ak je problém nainštalova tento balíèek pre Windows,
+				treba stiahnu potrebnı .whl balíèk zo stránky https://www.lfd.uci.edu/~gohlke/pythonlibs/ a naištalova ho pomocou pip)
+------------------------------------------------------------
+
+
+
