@@ -55,7 +55,7 @@ function removeHoursFromDate(dateWithHours) {
 
 //setting time label when application starts
 function actualizeTimeLabel() {
-	document.getElementById("time").innerHTML = "time : " + getActualTime() + " : 00" ;
+	document.getElementById("time").innerHTML = "Current Time : " + getActualTime() + " : 00" ;
 }
 
 //changing label for picked time, function is called when timeline panel is changed.
@@ -194,7 +194,7 @@ function resetAnimation() {
 	var elem = document.getElementById("playStopButton");
 	elem.value = "PLAY";
 	switcher = true;
-	
+
 }
 
 function showLoading(shown) {
